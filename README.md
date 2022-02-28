@@ -158,27 +158,28 @@ Previous versions have been developed on CodePen; the current version is live on
   - koi pond
 
 ## History
-February 27, 2022
-- brief moved to readme.md and cleaned up
-- GitHub repo initialized
-October 11, 2021
-- project stage introduced to track complete/incomplete status etc
-- dashboard with shipping details & active projects added to Google Sheet doc
-October 9, 2021
-- auto logging for last shipped date and last update to row
-September 25, 2021
-- all projects not currently active are set to ‘Holding’ phase
-September 24, 2021
-- merged Considering phase into Holding
-- prioritization tweaks:
-  - overall sorting priority is now a combination of satisfaction, estimated time required, and how urgent the work is
-  - projects that are in the Holding phase are visibly de-emphasised to encourage focusing on completing the things that need work
-  - phases are now color coded
-September 11, 2021
-- removed tasks fields and replaced with ‘Note’ field
+- February 27, 2022
+  - brief moved to readme.md and cleaned up
+  - GitHub repo initialized
+- October 11, 2021
+  - project stage introduced to track complete/incomplete status etc
+  - dashboard with shipping details & active projects added to Google Sheet doc
+- October 9, 2021
+  - auto logging for last shipped date and last update to row
+- September 25, 2021
+  - all projects not currently active are set to ‘Holding’ phase
+- September 24, 2021
+  - merged Considering phase into Holding
+  - prioritization tweaks:
+    - overall sorting priority is now a combination of satisfaction, estimated time required, and how urgent the work is
+    - projects that are in the Holding phase are visibly de-emphasised to encourage focusing on completing the things that need work
+    - phases are now color coded
+- September 11, 2021
+  - removed tasks fields and replaced with ‘Note’ field
 
-## Sources
-- [CSS expand/collapse trick](https://stackoverflow.com/questions/13630229/can-i-have-an-onclick-effect-in-css)
+## Resources
+- [Details Element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/details)
+  - replacing: [CSS expand/collapse trick](https://stackoverflow.com/questions/13630229/can-i-have-an-onclick-effect-in-css)
 ### Inspiration
   - [Carrd](https://carrd.co/)
   - [Lope - App on Google Play](https://play.google.com/store/apps/details?id=com.twoorgu.lope)
