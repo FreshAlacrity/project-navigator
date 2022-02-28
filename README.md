@@ -68,21 +68,15 @@ Previous versions have been developed on CodePen; the current version is live on
   - Public and private sections with clear visual indication of which is which
     - Preview mode for public projects (default)
 
-## Priorities
-- make the list searchable by project name
-  - add autocomplete for project names
-- url parameters to link to specific projects and to search input
-- search aliases
-  - ex. searching for 'open source' should bring up things with License: MIT
-
 ### Next
-- set up scripts/site etc as a submodule
+- work on moving more of these todo items to [GitHub Issues](https://github.com/FreshAlacrity/project-navigator/issues)
+- set up the Project Navigator as a submodule of my GitHub Pages site, ex. as `freshalacrity.github.io/projects`
+  - set up subdirectories for network view (/explore/?) and trello style /board/
+  - decide on a file directory structure for projects with a collection of information to store (image gallery, readme etc) but not enough information to need their own repository
+  - decide on how and where to store data for private projects, since websites can't freely access local files
 - make a JavaScript version of the function for a new project ID, `=DEC2HEX(RANDBETWEEN(0, 4294967295), 8)`
-- make function to pull a row or rows into a tidy JSON format by header
-  - snag my scripts for this from Cottage Industry
-- new google apps script function in to update a specific project's spreadsheet row
-- support for search, edit, & update functionality from a webpage
-- prototype new product page from mockup
+- support for search, edit, & update functionality from web view
+- prototype new project page from [mockup](https://designer.gravit.io/?token=OQwUbHc83kinSCEQKqKSD4fDa6q4SMIp)
   - start with just displaying the information from the spreadsheet with an image up top, then support interactive inline SVG with an option to make that fullscreen
 - automatically filter public and private link types
   - show plaintext readout of public projects and which projects they link to
@@ -91,30 +85,11 @@ Previous versions have been developed on CodePen; the current version is live on
   - prioritize live > codepen > mockup > github > brief > image url
 
 ## Known Issues
-- it’s getting hard to find specific projects (they kinda need to be searchable)
+- current default project tile web view has editable project titles instead of linked project titles
 - version 2 of the NIH research infographic - why is this broken?
-- broken images cause a lot of error logging when trying to sample pixel colors - do they keep trying to load?
-- no about page
 - shabby pubs selection/unpolished display
   - many projects not ready to be published
     - briefs not edited with publication in mind
-- data structure
-  - no support for storing multiple images per project
-    - try making a GitHub repository with folders of project images and see if there's a way I can make a page that includes a gallery of those images and the brief with just a directory name (or maybe use the project ID as the folder title? not very human readable though - not sure if that's a pro or a con)
-  - no way to show/record dependencies/projects that need to be worked on before others (and prioritize accordingly)
-    - add a column for pre-requisites, things that must be shipped for this to be shipped/incremented
-  - no support for due dates or recurring/documentation projects (i.e. budget, income reporting, vision) that need to be revised every so often
-  - possible synonyms: organization and review
-
-## Later
-- Include briefs within the Project Navigator interface
-- Figure out how to sync/include the Google Apps Scripts that are used in the GitHub repo
-- Fill in more images for existing projects
-  - add image descriptions for all project images
-- New favicon with a margin so it doesn't clip like the current one
-- Fill in CodePen, GitHub etc to Tech tags automatically
-- Function to check if image files are present/links not broken
-- For ‘other’ links have it grab the website title from the url
 
 ### Stretch Goals
 - Make available as a public app/webapp
@@ -149,6 +124,7 @@ Previous versions have been developed on CodePen; the current version is live on
       - Option to save the code used on a computer to be used whenever voting
 - Intuitive ways to adjust project priority
 - Visual indicator or grouping by what group/category a project belongs to (codebase, graphic design etc)
+
 #### Possible Site Views
 - Focused, polished homepage
   - Emphasize/front face a design each that does a good job showing something: Intuitive, Recent, Relevant
@@ -204,6 +180,6 @@ September 11, 2021
 ## Sources
 - [CSS expand/collapse trick](https://stackoverflow.com/questions/13630229/can-i-have-an-onclick-effect-in-css)
 ### Inspiration
-  - Carrd
+  - [Carrd](https://carrd.co/)
   - [Lope - App on Google Play](https://play.google.com/store/apps/details?id=com.twoorgu.lope)
   - [Toggl Time Tracker](https://toggl.com/)
