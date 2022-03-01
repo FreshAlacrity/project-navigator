@@ -10,7 +10,7 @@ function update(entryObj) {
       headers: { 'Content-Type': 'application/json' },
       mode:"no-cors"
       })
-    .then(response => log(`Updated project ID ${entryObj['_Project ID']} with response: '${JSON.stringify(response)}'`));
+    .then(response => log(`Updated project ID ${entryObj['Project ID']} with response: '${JSON.stringify(response)}'`));
   } else {
     log(`Can't update a project without a project entry object!`)
   }
@@ -43,7 +43,7 @@ function assignKeywords(entry) {
 
 function merge(allData) {
   allData._projects_list = allData._projects_list.map(assignKeywords)
-  allData._projects_by_ID = byKey(allData._projects_list, '_Project ID')
-  update(entryObj = { '_Project ID': '443BF665', 'Project Title': 'Test Project' })
+  allData._projects_by_ID = byKey(allData._projects_list, 'Project ID')
+  //update(entryObj = { 'Project ID': '443BF665', 'Project Title': 'Test Project' })
   return allData
 }
