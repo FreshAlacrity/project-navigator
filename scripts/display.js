@@ -6,7 +6,7 @@ function display(data) {
     // #next print out all unused properties
     return str
   }
-  let projectsList = data._projects_list
+  let projectsList = search(data)._showing
   let pageElements = [
       { 
         id: 'page-header', 

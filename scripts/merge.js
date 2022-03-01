@@ -1,10 +1,33 @@
+
+
+function update(entryObj) {
+  if (entryObj) {
+    // #later better validation here
+    fetch(sheetsURL, {
+      credentials:'omit', 
+      method:"POST", 
+      body:JSON.stringify(entryObj),
+      headers: { 'Content-Type': 'application/json' },
+      mode:"no-cors"
+      })
+    .then(response => log(`Updated project ID ${entryObj['_Project ID']} with response: '${JSON.stringify(response)}'`));
+  } else {
+    log(`Can't update a project without a project entry object!`)
+  }
+}
+
+
 function byKey(arrayOfObj, key) {
   let newObj = {}
   arrayOfObj.forEach(entry => {
-    if (newObj.hasOwnProperty([entry[key]])){
-      log(`Key colision: ${key} for ${JSON.stringify(entry)} already taken`)
+    if (entry.hasOwnProperty(key)) {
+      if (newObj.hasOwnProperty([entry[key]])) {
+        log(`Key colision: ${key} for ${JSON.stringify(entry)} already taken`)
+      }
+      newObj[entry[key]] = entry
+    } else {
+      log(`Can't list ${JSON.stringify(entry)} by ${key} because it doesn't have that property`)
     }
-    newObj[entry[key]] = entry
   })
   return newObj
 }
@@ -13,9 +36,14 @@ function no(project, thing) {
   if (!project[thing]) { log(`${project['Project Title']} has no ${thing}`) }
 }
 
+function assignKeywords(entry) {
+
+  return entry
+}
+
 function merge(allData) {
-  // #todo check each project for ID
-  // #todo make IDs for projects that have none
-  // #todo make a dictionary of projects by ID
+  allData._projects_list = allData._projects_list.map(assignKeywords)
+  allData._projects_by_ID = byKey(allData._projects_list, '_Project ID')
+  update(entryObj = { '_Project ID': '443BF665', 'Project Title': 'Test Project' })
   return allData
 }

@@ -13,7 +13,7 @@ function checkSpreadsheetImport (data) {
 function tableToJSON(tableData) {
   let arr = []
   let headers = tableData[0]
-  tableData = tableData.slice(1) // to remove the header and the row of analytics
+  tableData = tableData.slice(2) // to remove the header and the row of analytics
   tableData.forEach(row => {
     let name = row[0]
     let newObj = {}

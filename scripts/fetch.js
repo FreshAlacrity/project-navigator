@@ -9,20 +9,19 @@ function log (...args) { console.log(alacrity.tidy(...args)) }
 async function gatherData(fresh = false) {
 
   // get url parameters
-  const params = new URLSearchParams(window.location.search)
-
-  let dataObj = { }
+  let dataObj = { _params: new URLSearchParams(window.location.search) }
+  if (dataObj._params.get('reload')) { fresh = true }
   let dataSources = [
     {
       key: '_projects_list',
-      // to support fetching data from different sheets:
-      loc: ('projects' ?? params.get('fetch')), 
+      // to support fetching data from different/test sheets:
+      loc: (dataObj._params.get('fetch') ?? 'projects'), 
       url: sheetsURL,
       parse: getSheetData,
       always_fetch: false
     }
   ]
-
+  
   // check what keys localForage has saved (later maybe avoid if fresh is set?)
   let localTest = await localforage.keys().then(keys => {
     if (fresh) {
@@ -50,7 +49,6 @@ async function gatherData(fresh = false) {
       // load from localforage
       //log(`loading ${source.key} data from local storage`)
       return localforage.getItem(source.key).then(data => {
-        dataObj[source.key] = data
         log(`${source.key} data loaded from local storage`)
         return data
       }).catch(log)
@@ -67,7 +65,6 @@ async function gatherData(fresh = false) {
             data = source.parse(data, source.key)
           }
           log(`${source.key} data fetched from source`)
-          dataObj[source.key] = data
           store(source.key, data)
           return data
         }).catch(log)
@@ -76,5 +73,5 @@ async function gatherData(fresh = false) {
   }
 
   let tests = await Promise.all(dataSources.map(load))
-  return merge(Object.assign(...tests))
+  return merge(Object.assign(dataObj, ...tests))
 }
