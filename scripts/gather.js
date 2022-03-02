@@ -1,20 +1,15 @@
-const gitHubURL = 'https://github.com/FreshAlacrity/project-navigator/main/'
-const sheetsURL = 'https://script.google.com/macros/s/AKfycbwKryEU-Vhr-1m18QsRSc6CMjiNRcSbSCgNO5hOalOC6vtwtyLVme_kPvqZV_2FMmGc/exec'
-
-
-function log (...args) { console.log(alacrity.tidy(...args)) }
 
 // localForage automatically does JSON.parse() and JSON.stringify() when getting/setting values
-
 async function gatherData(fresh = false) {
+  const gitHubURL = 'https://github.com/FreshAlacrity/project-navigator/main/'
+  const sheetsURL = 'https://script.google.com/macros/s/AKfycbwKryEU-Vhr-1m18QsRSc6CMjiNRcSbSCgNO5hOalOC6vtwtyLVme_kPvqZV_2FMmGc/exec'
 
   // get url parameters
   let dataObj = { _params: new URLSearchParams(window.location.search) }
-  if (dataObj._params.get('reload')) { fresh = true }
   let dataSources = [
     {
       key: '_projects_list',
-      // to support fetching data from different/test sheets:
+      // 'fetch' param supports fetching data from different/test sheets
       loc: (dataObj._params.get('fetch') ?? 'projects'), 
       url: sheetsURL,
       parse: getSheetData,
@@ -24,7 +19,7 @@ async function gatherData(fresh = false) {
   
   // check what keys localForage has saved (later maybe avoid if fresh is set?)
   let localTest = await localforage.keys().then(keys => {
-    if (fresh) {
+    if (dataObj._params.get('reload')) {
       log(`Loading fresh data, clearing local keys: ${keys.join(", ")}`)
       keys.forEach(a => { localforage.removeItem(a) })
       return {}

@@ -15,8 +15,9 @@ function updateUrl(paramsObj = {}) {
 
 function newSearch(terms, event) {
   // update page title
-
+  
   log(`Searching...${terms}`)
+  updateProjectList() // #todo get data
 }
 
 // #todo make a way to validate all urls through this alias list
@@ -166,54 +167,68 @@ function searchElement() {
   })
   return searchBar
 }
-  
-// #todo sort order
-function display(data) {
-  let divider = ' · '
-  function makeProjectEntry(a, open = false) {
-    //let entry = document.createElement('li')
-    let entry = document.createElement('details')
 
-    if (open) {
-      entry.setAttribute('open', 'true') // can't be removed by setting false
-    }
+function makeProjectEntry(a, open = false) {
+  //let entry = document.createElement('li')
+  let entry = document.createElement('details')
 
-    let title = document.createElement('summary')
-    title.innerHTML = a['Project Title']
-    entry.appendChild(title)
-
-    let details = document.createElement('ul')
-
-    // #next images
-    let printSettings = {
-      'Last Shipped': prettyDate,
-      'Last Updated': prettyDate,
-      'Brief': prettyLink,
-      '_Other': prettyLink,
-      'Inspiration': prettyLink,
-      'Learn More': prettyLink,
-      'Mockup': prettyLink,
-      'Live': prettyLink
-    }
-    Object.keys(a).forEach(b => {
-      if (a[b] && b.charAt(0) !== '_' || printSettings.hasOwnProperty(b)){
-        let printFunction = printSettings[b] ?? span
-        printFunction(a, b, details)
-      } else {
-        // #later allow adding + editing project information
-      }
-    })
-
-    entry.appendChild(details)
-    return entry
+  if (open) {
+    entry.setAttribute('open', 'true') // can't be removed by setting false
   }
-  let projectsList = search(data)._showing
+
+  let title = document.createElement('summary')
+  title.innerHTML = a['Project Title']
+  entry.appendChild(title)
+
+  let details = document.createElement('ul')
+
+  // #next images
+  let printSettings = {
+    'Last Shipped': prettyDate,
+    'Last Updated': prettyDate,
+    'Brief': prettyLink,
+    '_Other': prettyLink,
+    'Inspiration': prettyLink,
+    'Learn More': prettyLink,
+    'Mockup': prettyLink,
+    'Live': prettyLink
+  }
+  Object.keys(a).forEach(b => {
+    if (a[b] && b.charAt(0) !== '_' || printSettings.hasOwnProperty(b)){
+      let printFunction = printSettings[b] ?? span
+      printFunction(a, b, details)
+    } else {
+      // #later allow adding + editing project information
+    }
+  })
+
+  entry.appendChild(details)
+  return entry
+}
+
+function updateProjectList() {
+  let projectsArr = search(stored)._showing
+  let projectList = document.createElement('section')
+  let open = (projectsArr.length < 3) // #later tweak this
+  projectsArr.forEach(a => {
+    projectList.appendChild(makeProjectEntry(a, open))
+  })
+  let previous = document.getElementById('project-list-container')
+  document.getElementById('page').appendChild(projectList, previous)
+  return true
+}
+
+function display(data) {
+  //let divider = ' · '
   
-  //{ id: 'contact-information', type: 'footer', parent: document.body }
-    
-  let main = document.createElement('main')
+  stored = data // supports current project update function
+
+  let page = document.createElement('div')
+  page.setAttribute('id', 'page')
+  document.body.appendChild(page)
+
   let header = document.createElement('header')
-  main.appendChild(header)
+  page.appendChild(header)
 
   let title = document.createElement('h3')
   title.innerHTML = 'Featured Projects'
@@ -221,12 +236,13 @@ function display(data) {
 
   header.appendChild(searchElement())
 
-  let projectList = document.createElement('section')
-  let open = (projectsList.length < 3) // #later tweak this
-  projectsList.forEach(a => {
-    projectList.appendChild(makeProjectEntry(a, open))
-  })
-  main.appendChild(projectList)
-  document.body.appendChild(main)
+  let main = document.createElement('main')
+  main.setAttribute('id', 'project-list-container')
+  page.appendChild(main)
+
+  //{ id: 'contact-information', type: 'footer', parent: document.body }
+  
+  // must be after all the appropriate elements are added to the page:
+  updateProjectList()
 }
 
