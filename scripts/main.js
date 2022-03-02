@@ -1,3 +1,2 @@
-var reloadAllData = false
-gatherData(reloadAllData).then(data => display(data))
+gatherData().then(data => display(data))
 

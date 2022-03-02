@@ -6,7 +6,7 @@ function log (...args) { console.log(alacrity.tidy(...args)) }
 
 // localForage automatically does JSON.parse() and JSON.stringify() when getting/setting values
 
-async function gatherData(fresh = false) {
+async function gatherData() {
 
   // get url parameters
   let dataObj = { _params: new URLSearchParams(window.location.search) }
