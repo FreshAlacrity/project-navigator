@@ -13,14 +13,18 @@ function updateUrl(paramsObj = {}) {
   window.history.replaceState({}, 'New Page Title Here #todo', newUrl)
 }
 
-function newSearch(terms, event) {
+function newSearch(terms = '') {
   // update page title
+  // #todo set defaults
   
   log(`Searching...${terms}`)
-  updateProjectList() // #todo get data
+  document.title = terms + ' | Project Navigator'
+  // #later title case the search terms/make them pretty?
+  // #later detect project IDs and make pretty titles for singles or lists of those
+  //document.getElementById('page-title').innerText = `: ${terms}`
+  updateProjectList(terms) // #todo get data
 }
 
-// #todo make a way to validate all urls through this alias list
 function getLinkTitle(link) {
   let aliases = {
     'github.com':'GitHub Source',
@@ -91,7 +95,7 @@ function prettyLink(entry, key, parent) {
   return links.length
 }
 
-function searchElement() {
+function makeSearchElement() {
   // see https://stackoverflow.com/questions/4509761/whats-the-best-semantic-way-to-wrap-a-search-area/4509828
   /*
     <section role="search">
@@ -108,6 +112,7 @@ function searchElement() {
   */
   let searchBar = document.createElement('section')
   searchBar.setAttribute('role', 'search')
+  searchBar.setAttribute('class', 'search')
 
   let searchForm = document.createElement('form')
   searchForm.setAttribute('action', '#')
@@ -131,6 +136,8 @@ function searchElement() {
   searchInput.setAttribute('name', 's')
   searchInput.setAttribute('id', 's')
   searchInput.setAttribute('placeholder', 'Search...')
+  let searchTerms = new URLSearchParams(window.location.search).get('s')
+  if (searchTerms) { searchInput.setAttribute('value', searchTerms) }
   searchLabel.appendChild(searchInput)
 
   let searchButton = document.createElement('button')
@@ -144,15 +151,14 @@ function searchElement() {
       // catch enter and update URL
       updateUrl({ s: searchInput.value })
     }
-    newSearch(searchInput.value, event)
+    newSearch(searchInput.value)
   })
 
   searchInput.addEventListener('click', (event) => {
     // detect 'x' button press
     if (searchInput.value === '') {
       updateUrl({ s: '' })
-      // #todo go back to default
-      newSearch(searchInput.value, event)
+      newSearch(searchInput.value)
     }
   })
   
@@ -160,7 +166,7 @@ function searchElement() {
   searchForm.addEventListener('submit', (event) => {
     //newSearch(event)
     updateUrl({ s: searchInput.value })
-    newSearch(searchInput.value, event)
+    newSearch(searchInput.value)
     //event.preventDefault()
     // prevent the page reloading: (also stops url from changing the usual way)
     event.returnValue = false // alternatively, just return false
@@ -177,6 +183,7 @@ function makeProjectEntry(a, open = false) {
   }
 
   let title = document.createElement('summary')
+  title.setAttribute('class', 'project-title')
   title.innerHTML = a['Project Title']
   entry.appendChild(title)
 
@@ -206,9 +213,9 @@ function makeProjectEntry(a, open = false) {
   return entry
 }
 
-function updateProjectList() {
-  let projectsArr = search(stored)._showing
-  let projectList = document.createElement('section')
+function updateProjectList(searchTerms = '') {
+  let projectsArr = search(stored, searchTerms)._showing
+  let projectList = document.createElement('main')
   let open = (projectsArr.length < 3) // #later tweak this
   projectsArr.forEach(a => {
     projectList.appendChild(makeProjectEntry(a, open))
@@ -220,7 +227,7 @@ function updateProjectList() {
 
 function display(data) {
   //let divider = ' · '
-  
+
   stored = data // supports current project update function
 
   let page = document.createElement('div')
@@ -230,11 +237,12 @@ function display(data) {
   let header = document.createElement('header')
   page.appendChild(header)
 
-  let title = document.createElement('h3')
-  title.innerHTML = 'Featured Projects'
+  let title = document.createElement('h1')
+  title.setAttribute('id', 'page-title')
+  title.innerText = 'FreshAlacrity | Projects'
   header.appendChild(title)
 
-  header.appendChild(searchElement())
+  header.appendChild(makeSearchElement())
 
   let main = document.createElement('main')
   main.setAttribute('id', 'project-list-container')
@@ -242,7 +250,7 @@ function display(data) {
 
   //{ id: 'contact-information', type: 'footer', parent: document.body }
   
-  // must be after all the appropriate elements are added to the page:
-  updateProjectList()
+  // must be after 'project-list-container' element is properly added to the page:
+  newSearch(new URLSearchParams(window.location.search).get('s'))
 }
 

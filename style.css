@@ -7,10 +7,40 @@ body {
 }
 
 #page {
-  margin: 5em;
+  margin: 0;
 }
 
 details {
   margin-top: 1em;
   margin-bottom: 1em;
+}
+
+.search fieldset {
+  border: none;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+}
+
+.search legend {
+  /* via https://stackoverflow.com/a/9021903/2735578 */
+  position: absolute;
+  left: -9999px;
+  width: 100px;
+  height: auto;
+  overflow: hidden;
+}
+
+header, main, footer {
+  padding: 0 5vw;
+}
+
+header { 
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 0.1rem solid currentColor;
+}
+
+.project-title {
+  font-size: 140%;
 }

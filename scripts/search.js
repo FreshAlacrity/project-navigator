@@ -1,6 +1,6 @@
-function search(projectsObj) {
-  if (projectsObj._params.get('s')) {
-    let searchTermsArr = projectsObj._params.get('s').split(' ')
+function search(projectsObj, searchTerms = '') {
+  if (searchTerms) {
+    let searchTermsArr = searchTerms.split(' ')
     let searchResults = []
     let byId = projectsObj._projects_by_ID
     // #later maybe reserve a particular URL parameter/keyword for pulling up a specific project

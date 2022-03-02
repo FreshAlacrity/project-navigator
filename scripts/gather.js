@@ -5,12 +5,13 @@ async function gatherData(fresh = false) {
   const sheetsURL = 'https://script.google.com/macros/s/AKfycbwKryEU-Vhr-1m18QsRSc6CMjiNRcSbSCgNO5hOalOC6vtwtyLVme_kPvqZV_2FMmGc/exec'
 
   // get url parameters
-  let dataObj = { _params: new URLSearchParams(window.location.search) }
+  let dataObj = {}
+  let params = new URLSearchParams(window.location.search)
   let dataSources = [
     {
       key: '_projects_list',
       // 'fetch' param supports fetching data from different/test sheets
-      loc: (dataObj._params.get('fetch') ?? 'projects'), 
+      loc: (params.get('fetch') ?? 'projects'), 
       url: sheetsURL,
       parse: getSheetData,
       always_fetch: false
@@ -19,7 +20,7 @@ async function gatherData(fresh = false) {
   
   // check what keys localForage has saved (later maybe avoid if fresh is set?)
   let localTest = await localforage.keys().then(keys => {
-    if (dataObj._params.get('reload')) {
+    if (params.get('reload')) {
       log(`Loading fresh data, clearing local keys: ${keys.join(", ")}`)
       keys.forEach(a => { localforage.removeItem(a) })
       return {}
@@ -36,8 +37,6 @@ async function gatherData(fresh = false) {
     localforage.setItem(key, obj).catch(log) 
   }
 
-  // #todo check that data is getting loaded properly
-  // #todo check loc against local data's loc
   function load(source) {
     if (!fresh && !source.always_fetch && stored(source.key)) {
 
