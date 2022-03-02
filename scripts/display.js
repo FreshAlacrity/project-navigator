@@ -1,4 +1,4 @@
-function updateUrl(paramsObj = {}) {
+function newUrl(paramsObj = {}) {
   // #later check to make sure there's no '#' in any of the paramsObj values
   let params = new URLSearchParams(window.location.search)
   for (const [key, value] of Object.entries(paramsObj)) {
@@ -8,9 +8,12 @@ function updateUrl(paramsObj = {}) {
       params.delete(key)
     }
   }
-  let newUrl = `${window.location.origin}${window.location.pathname}?${params.toString()}`
+  return `${window.location.origin}${window.location.pathname}?${params.toString()}`
+}
+
+function updateUrl(paramsObj = {}) {
   // #later learn how/where the state information (here {}) can be accessed
-  window.history.replaceState({}, 'New Page Title Here #todo', newUrl)
+  window.history.replaceState({}, 'New Page Title Here #todo', newUrl(paramsObj))
 }
 
 function newSearch(terms = '') {
@@ -214,14 +217,18 @@ function makeProjectEntry(a, open = false) {
 }
 
 function updateProjectList(searchTerms = '') {
-  let projectsArr = search(stored, searchTerms)._showing
+  let previous = document.getElementById('project-list-container')
+
   let projectList = document.createElement('main')
+  projectList.setAttribute('id', 'project-list-container')
+
+  let projectsArr = search(stored, searchTerms)._showing
   let open = (projectsArr.length < 3) // #later tweak this
   projectsArr.forEach(a => {
     projectList.appendChild(makeProjectEntry(a, open))
   })
-  let previous = document.getElementById('project-list-container')
-  document.getElementById('page').appendChild(projectList, previous)
+
+  document.getElementById('page').replaceChild(projectList, previous)
   return true
 }
 
@@ -239,7 +246,23 @@ function display(data) {
 
   let title = document.createElement('h1')
   title.setAttribute('id', 'page-title')
-  title.innerText = 'FreshAlacrity | Projects'
+
+  // #later make it so these don't reload the page?
+  let homeLink = document.createElement('a')
+  // link to home project ('About Me')
+  homeLink.setAttribute('href', newUrl({ s: '2FFFFAB9' }))
+  homeLink.innerText = 'FreshAlacrity'
+  title.appendChild(homeLink)
+
+  let titleText = document.createElement('span')
+  titleText.innerText = ' | '
+  title.appendChild(titleText)
+
+  let allLink = document.createElement('a')
+  allLink.setAttribute('href', newUrl({ s: '' }))
+  allLink.innerText = 'Projects'
+  title.appendChild(allLink)
+
   header.appendChild(title)
 
   header.appendChild(makeSearchElement())

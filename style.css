@@ -6,6 +6,10 @@ body {
   padding: 0;
 }
 
+a, a:hover, a:link,  a:visited,  a:active {
+  color: currentColor;
+}
+
 #page {
   margin: 0;
 }
