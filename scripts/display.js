@@ -223,7 +223,7 @@ function updateProjectList(searchTerms = '') {
   projectList.setAttribute('id', 'project-list-container')
 
   let projectsArr = search(stored, searchTerms)._showing
-  let open = (projectsArr.length < 3) // #later tweak this
+  let open = (projectsArr.length < 3) // #later tweak this to take project entry length into account
   projectsArr.forEach(a => {
     projectList.appendChild(makeProjectEntry(a, open))
   })

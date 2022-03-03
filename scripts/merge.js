@@ -1,5 +1,3 @@
-
-
 function update(entryObj) {
   if (entryObj) {
     // #later better validation here
@@ -16,6 +14,29 @@ function update(entryObj) {
   }
 }
 
+function makeTitleDict(data) {
+  // make a dictionary of names to ids
+  let entry_list = Object.values(data)
+  let idsByTitle = {}
+  entry_list.forEach(e => {
+    let namesList = []
+    if (e['Aliases']){
+     namesList = e['Aliases'].split(', ')
+    }
+    namesList.push(e['Project Title'])
+    namesList.forEach(n => {
+      n = n.toLowerCase()
+      if (!n) {
+        log(`invalid name '${n}' from entry ` + JSON.stringify(e))
+      } else if (idsByTitle.hasOwnProperty(n)) {
+        log(`More than one project has the name/alias '${n}': ${idsByTitle[n]} and ${e['Project ID']}`)
+      }
+      idsByTitle[n] = e['Project ID']
+    })
+    
+  })
+  return idsByTitle
+}
 
 function byKey(arrayOfObj, key) {
   let newObj = {}
@@ -44,6 +65,7 @@ function assignKeywords(entry) {
 function merge(allData) {
   allData._projects_list = allData._projects_list.map(assignKeywords)
   allData._projects_by_ID = byKey(allData._projects_list, 'Project ID')
+  allData._IDs_by_title = makeTitleDict(allData._projects_by_ID)
   //update(entryObj = { 'Project ID': '443BF665', 'Project Title': 'Test Project' })
   return allData
 }
