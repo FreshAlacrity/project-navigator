@@ -108,45 +108,48 @@ function emptyProject() {
   return blankProject
 }
 
-function updateProjectList(source, searchTerms = '') {
-  function makeProjectEntry(a, open = false) {
-    //let entry = document.createElement('li')
-    let entry = document.createElement('details')
+function makeProjectEntry(a, open = false) {
+  //let entry = document.createElement('li')
+  let entry = document.createElement('details')
 
-    if (open) {
-      entry.setAttribute('open', 'true') // can't be removed by setting false
-    }
-
-    let title = document.createElement('summary')
-    title.setAttribute('class', 'project-title')
-    title.innerHTML = a['Project Title']
-    entry.appendChild(title)
-
-    let details = document.createElement('ul')
-
-    // #next images
-    let printSettings = {
-      'Last Shipped': prettyDate,
-      'Last Updated': prettyDate,
-      'Brief': prettyLink,
-      '_Other': prettyLink,
-      'Inspiration': prettyLink,
-      'Learn More': prettyLink,
-      'Mockup': prettyLink,
-      'Live': prettyLink
-    }
-    Object.keys(a).forEach(b => {
-      if (a[b] && b.charAt(0) !== '_' || printSettings.hasOwnProperty(b)){
-        let printFunction = printSettings[b] ?? span
-        printFunction(a, b, details)
-      } else {
-        // #later allow adding + editing project information
-      }
-    })
-
-    entry.appendChild(details)
-    return entry
+  if (open) {
+    entry.setAttribute('open', 'true') // can't be removed by setting false
   }
+
+  let title = document.createElement('summary')
+  title.setAttribute('class', 'project-title')
+  title.innerHTML = a['Project Title']
+  entry.appendChild(title)
+
+  let details = document.createElement('ul')
+
+  // #next add images
+  // #todo detect these automatically
+  let printSettings = {
+    'Last Shipped': prettyDate,
+    'Last Updated': prettyDate,
+    'Brief': prettyLink,
+    '_Other': prettyLink,
+    'Inspiration': prettyLink,
+    'Learn More': prettyLink,
+    'Mockup': prettyLink,
+    'Live': prettyLink
+  }
+  Object.keys(a).forEach(b => {
+    if (a[b] && b.charAt(0) !== '_' || printSettings.hasOwnProperty(b)){
+      let printFunction = printSettings[b] ?? span
+      printFunction(a, b, details)
+    } else {
+      // #later allow adding + editing project information
+    }
+  })
+
+  entry.appendChild(details)
+  return entry
+}
+
+function updateProjectList(source, searchTerms = '') {
+
 
   let previous = document.getElementById('project-list-container')
 

@@ -88,13 +88,13 @@ function search(source, searchTerms = '') {
     source.showing = source.data.list
     
     source.showing.sort((a, b) => {
-      return a._Test - b._Test
+      return a[source.order_by] - b[source.order_by] // #test
     })
   } else {
     source.showing = source.data.list.filter(entry => {
       // display how well the project matched the search for debug:
-      entry.Match = (searchResults[entry['Project ID']] * 100)
-      if (searchResults[entry['Project ID']] > 0) {
+      entry.Match = (searchResults[entry[source.id]] * 100)
+      if (searchResults[entry[source.id]] > 0) {
         return true
       } else {
         return false

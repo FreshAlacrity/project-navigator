@@ -27,8 +27,8 @@ async function getlocal(source) {
 }
 
 localforage.keys().then(keys => {
-  for (const [type, source] of Object.entries(globalStorage._data_sources)) {
-    log(`comparing ${source.key} and ${keys}`)
+  log(`available local storage keys: ${keys}`)
+  for (const [type, source] of Object.entries(globalStorage._data_sources)) {    
     if (keys.includes(source.key)) {
       // fetch it from local storage
       getlocal(source).then(merge).then(display)
