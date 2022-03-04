@@ -1,3 +1,11 @@
+function newSearch(terms = '') {
+  //log(`Searching...${terms}`)
+  document.title = terms + ' | Project Navigator'
+  // #later detect project IDs + sub in project titles
+  //document.getElementById('page-title').innerText = `: ${terms}`
+  updateProjectList(terms) // #todo get data
+}
+
 function newUrl(paramsObj = {}) {
   // #later check to make sure there's no '#' in any of the paramsObj values
   let params = new URLSearchParams(window.location.search)
@@ -14,18 +22,6 @@ function newUrl(paramsObj = {}) {
 function updateUrl(paramsObj = {}) {
   // #later learn how/where the state information (here {}) can be accessed
   window.history.replaceState({}, 'New Page Title Here #todo', newUrl(paramsObj))
-}
-
-function newSearch(terms = '') {
-  // update page title
-  // #todo set defaults
-  
-  log(`Searching...${terms}`)
-  document.title = terms + ' | Project Navigator'
-  // #later title case the search terms/make them pretty?
-  // #later detect project IDs and make pretty titles for singles or lists of those
-  //document.getElementById('page-title').innerText = `: ${terms}`
-  updateProjectList(terms) // #todo get data
 }
 
 function getLinkTitle(link) {
@@ -98,125 +94,56 @@ function prettyLink(entry, key, parent) {
   return links.length
 }
 
-function makeSearchElement() {
-  // see https://stackoverflow.com/questions/4509761/whats-the-best-semantic-way-to-wrap-a-search-area/4509828
-  /*
-    <section role="search">
-      <form action="#" method="get">
-          <fieldset>
-              <legend>Search this website:</legend>
-              <label for="s">
-                  <input type="search" name="s" id="s" placeholder="Search..." maxlength="200" />
-              </label>
-              <button type="submit" title="Search this website now">Submit</button>
-          </fieldset>
-      </form>
-    </section>
-  */
-  let searchBar = document.createElement('section')
-  searchBar.setAttribute('role', 'search')
-  searchBar.setAttribute('class', 'search')
-
-  let searchForm = document.createElement('form')
-  searchForm.setAttribute('action', '#')
-  // ^ automatically updates the url
-  searchForm.setAttribute('method', 'get')
-  searchBar.appendChild(searchForm)
-
-  let searchFieldset = document.createElement('fieldset')
-  searchForm.appendChild(searchFieldset)
-
-  let searchLegend = document.createElement('legend')
-  searchLegend.innerHTML = 'Search Projects:'
-  searchFieldset.appendChild(searchLegend)
-
-  let searchLabel = document.createElement('label')
-  searchLabel.setAttribute('for', 's')
-  searchFieldset.appendChild(searchLabel)
-
-  let searchInput = document.createElement('input')
-  searchInput.setAttribute('type', 'search')
-  searchInput.setAttribute('name', 's')
-  searchInput.setAttribute('id', 's')
-  searchInput.setAttribute('placeholder', 'Search...')
-  let searchTerms = new URLSearchParams(window.location.search).get('s')
-  if (searchTerms) { searchInput.setAttribute('value', searchTerms) }
-  searchLabel.appendChild(searchInput)
-
-  let searchButton = document.createElement('button')
-  searchButton.setAttribute('type', 'submit')
-  searchButton.setAttribute('title', 'Search Now')
-  searchButton.innerText = 'Search'
-  searchFieldset.appendChild(searchButton)
-
-  searchInput.addEventListener('keyup', (event) => {
-    if (event.keyCode === 13) {
-      // catch enter and update URL
-      updateUrl({ s: searchInput.value })
-    }
-    newSearch(searchInput.value)
+function emptyProject() {
+  let blankProject = {}
+  stored._projects_list_headers.forEach(h => {
+    blankProject[h] = '+'
   })
-
-  searchInput.addEventListener('click', (event) => {
-    // detect 'x' button press
-    if (searchInput.value === '') {
-      updateUrl({ s: '' })
-      newSearch(searchInput.value)
-    }
-  })
-  
-  //searchButton.addEventListener('click', (event) => {  })
-  searchForm.addEventListener('submit', (event) => {
-    //newSearch(event)
-    updateUrl({ s: searchInput.value })
-    newSearch(searchInput.value)
-    //event.preventDefault()
-    // prevent the page reloading: (also stops url from changing the usual way)
-    event.returnValue = false // alternatively, just return false
-  })
-  return searchBar
-}
-
-function makeProjectEntry(a, open = false) {
-  //let entry = document.createElement('li')
-  let entry = document.createElement('details')
-
-  if (open) {
-    entry.setAttribute('open', 'true') // can't be removed by setting false
-  }
-
-  let title = document.createElement('summary')
-  title.setAttribute('class', 'project-title')
-  title.innerHTML = a['Project Title']
-  entry.appendChild(title)
-
-  let details = document.createElement('ul')
-
-  // #next images
-  let printSettings = {
-    'Last Shipped': prettyDate,
-    'Last Updated': prettyDate,
-    'Brief': prettyLink,
-    '_Other': prettyLink,
-    'Inspiration': prettyLink,
-    'Learn More': prettyLink,
-    'Mockup': prettyLink,
-    'Live': prettyLink
-  }
-  Object.keys(a).forEach(b => {
-    if (a[b] && b.charAt(0) !== '_' || printSettings.hasOwnProperty(b)){
-      let printFunction = printSettings[b] ?? span
-      printFunction(a, b, details)
-    } else {
-      // #later allow adding + editing project information
-    }
-  })
-
-  entry.appendChild(details)
-  return entry
+  // #todo fix links showing up oddly
+  // give it a fresh ID for the session?
+  return blankProject
 }
 
 function updateProjectList(searchTerms = '') {
+  function makeProjectEntry(a, open = false) {
+    //let entry = document.createElement('li')
+    let entry = document.createElement('details')
+
+    if (open) {
+      entry.setAttribute('open', 'true') // can't be removed by setting false
+    }
+
+    let title = document.createElement('summary')
+    title.setAttribute('class', 'project-title')
+    title.innerHTML = a['Project Title']
+    entry.appendChild(title)
+
+    let details = document.createElement('ul')
+
+    // #next images
+    let printSettings = {
+      'Last Shipped': prettyDate,
+      'Last Updated': prettyDate,
+      'Brief': prettyLink,
+      '_Other': prettyLink,
+      'Inspiration': prettyLink,
+      'Learn More': prettyLink,
+      'Mockup': prettyLink,
+      'Live': prettyLink
+    }
+    Object.keys(a).forEach(b => {
+      if (a[b] && b.charAt(0) !== '_' || printSettings.hasOwnProperty(b)){
+        let printFunction = printSettings[b] ?? span
+        printFunction(a, b, details)
+      } else {
+        // #later allow adding + editing project information
+      }
+    })
+
+    entry.appendChild(details)
+    return entry
+  }
+
   let previous = document.getElementById('project-list-container')
 
   let projectList = document.createElement('main')
@@ -227,12 +154,132 @@ function updateProjectList(searchTerms = '') {
   projectsArr.forEach(a => {
     projectList.appendChild(makeProjectEntry(a, open))
   })
+  // #todo make this conditional on edit mode:
+  //projectList.appendChild(makeProjectEntry(emptyProject(), false))
+  // #todo add a 'New Project' closed entry at the bottom of the list with a title of New Project (or the current search term if there aren't any matches?)
 
   document.getElementById('page').replaceChild(projectList, previous)
   return true
 }
 
+function makeId() {
+  return (Math.floor(Math.random()*4294967295)).toString(16).toUpperCase()
+}
+
+function addNew(input) {
+  alert(`Adding new project! ${input}`)
+  // #todo check if the project exists
+
+  // #todo add the new project
+  let projectObj = emptyProject()
+  projectObj['Project Title'] = input
+  projectObj['Project ID'] = makeId()
+  
+  // add the new entry to the right places
+  stored._projects_list.push(projectObj)
+  stored._projects_by_ID[projectObj['Project ID']] = projectObj
+  stored._IDs_by_title[input] = projectObj['Project ID']
+  
+  // #todo save to the sheet
+
+
+  newSearch(projectObj['Project ID'])
+}
+
 function display(data) {
+  function makeSearchElement() {
+    // see https://stackoverflow.com/questions/4509761/whats-the-best-semantic-way-to-wrap-a-search-area/4509828
+    /*
+      <section role="search">
+        <form action="#" method="get">
+            <fieldset>
+                <legend>Search this website:</legend>
+                <label for="s">
+                    <input type="search" name="s" id="s" placeholder="Search..." maxlength="200" />
+                </label>
+                <button type="submit" title="Search this website now">Submit</button>
+            </fieldset>
+        </form>
+      </section>
+    */
+    let searchBar = document.createElement('section')
+    searchBar.setAttribute('role', 'search')
+    searchBar.setAttribute('class', 'search')
+
+    let searchForm = document.createElement('form')
+    // point the form submit action to this page
+    searchForm.setAttribute('action', '#')
+    // append the form data to the url
+    searchForm.setAttribute('method', 'get')
+    // disable the browser's autocomplete so we can use our own
+    searchForm.setAttribute('autocomplete', 'off')
+    searchBar.appendChild(searchForm)
+
+    let searchFieldset = document.createElement('fieldset')
+    searchForm.appendChild(searchFieldset)
+
+    let searchLegend = document.createElement('legend')
+    searchLegend.innerHTML = 'Search Projects:'
+    searchFieldset.appendChild(searchLegend)
+
+    let searchLabel = document.createElement('label')
+    searchLabel.setAttribute('for', 's')
+    searchFieldset.appendChild(searchLabel)
+
+    let searchInput = document.createElement('input')
+    searchInput.setAttribute('type', 'search')
+    searchInput.setAttribute('name', 's')
+    searchInput.setAttribute('id', 's')
+    searchInput.setAttribute('placeholder', 'Search...')
+    let searchTerms = new URLSearchParams(window.location.search).get('s')
+    if (searchTerms) { searchInput.setAttribute('value', searchTerms) }
+    searchLabel.appendChild(searchInput)
+
+    let searchButton = document.createElement('button')
+    searchButton.setAttribute('type', 'submit')
+    searchButton.setAttribute('title', 'Search Now')
+    searchButton.innerText = 'Search'
+    searchFieldset.appendChild(searchButton)
+
+     // #todo make this conditional on edit mode:
+    let addNewButton = document.createElement('button')
+    addNewButton.setAttribute('type', 'submit')
+    addNewButton.setAttribute('title', 'Add New')
+    addNewButton.innerText = 'Add'
+    searchFieldset.appendChild(addNewButton)
+
+    addNewButton.addEventListener('click', (event) => {
+      addNew(searchInput.value)
+    })
+
+    searchInput.addEventListener('keyup', (event) => {
+      // #todo catch 'tab' and sub in autocomplete
+      if (event.keyCode === 13) {
+        // catch enter and update URL
+        updateUrl({ s: searchInput.value })
+      }
+      newSearch(searchInput.value)
+    })
+
+    searchInput.addEventListener('click', (event) => {
+      // detect 'x' button press
+      if (searchInput.value === '') {
+        updateUrl({ s: '' })
+        newSearch(searchInput.value)
+      }
+    })
+    
+    //searchButton.addEventListener('click', (event) => {  })
+    searchForm.addEventListener('submit', (event) => {
+      event.returnValue = false // alternatively, just return false
+      updateUrl({ s: searchInput.value })
+      newSearch(searchInput.value)
+      //event.preventDefault()
+      // prevent the page reloading: (also stops url from changing the usual way)
+    })
+    return searchBar
+  }
+
   //let divider = ' · '
 
   stored = data // supports current project update function
@@ -274,6 +321,6 @@ function display(data) {
   //{ id: 'contact-information', type: 'footer', parent: document.body }
   
   // must be after 'project-list-container' element is properly added to the page:
-  newSearch(new URLSearchParams(window.location.search).get('s'))
+  newSearch(new URLSearchParams(window.location.search).get('s') ?? '')
 }
 

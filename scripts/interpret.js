@@ -9,12 +9,12 @@ function checkSpreadsheetImport (data) {
   }
 }
 
-// to convert from Google Sheets to a handy object
-function tableToJSON(tableData) {
+function getSheetData(sheetData, key) {
+  let newObj = {}
   let arr = []
-  let headers = tableData[0]
-  tableData = tableData.slice(2) // to remove the header and the row of analytics
-  tableData.forEach(row => {
+  let headers = sheetData[0]
+  sheetData = sheetData.slice(2) // to remove the header and the row of analytics
+  sheetData.forEach(row => {
     let name = row[0]
     let newObj = {}
     newObj = {}
@@ -25,11 +25,7 @@ function tableToJSON(tableData) {
     })
     arr.push(newObj)
   })
-  return arr
-}
-
-function getSheetData(sheetData, key) {
-  let newObj = {}
-  newObj[key] = tableToJSON(sheetData)
+  newObj[key + '_headers'] = headers
+  newObj[key] = arr
   return newObj
 }

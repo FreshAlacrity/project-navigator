@@ -25,7 +25,6 @@ async function gatherData(fresh = false) {
       keys.forEach(a => { localforage.removeItem(a) })
       return {}
     } else {
-      //log(`Saved locally: ${keys.join(", ")}`)
       return Object.fromEntries(keys.map(key => [key, true]))
     }
   }).catch(log)
@@ -33,6 +32,7 @@ async function gatherData(fresh = false) {
   function stored(key) { 
     return localTest.hasOwnProperty(key) 
   }
+  
   function store(key, obj) { 
     localforage.setItem(key, obj).catch(log) 
   }
@@ -40,8 +40,6 @@ async function gatherData(fresh = false) {
   function load(source) {
     if (!fresh && !source.always_fetch && stored(source.key)) {
 
-      // load from localforage
-      //log(`loading ${source.key} data from local storage`)
       return localforage.getItem(source.key).then(data => {
         log(`${source.key} data loaded from local storage`)
         return data
@@ -49,13 +47,10 @@ async function gatherData(fresh = false) {
 
     } else {
 
-      // fetch and then store
-      //log(`fetching ${source.key} data from source`)
       return fetch(source.url + '?loc=' + source.loc, { credentials: "omit" })
         .then((response) => response.json())
         .then((data) => {
           if (typeof source.parse === 'function') {
-            //log(`running ${source.key} parse function`)
             data = source.parse(data, source.key)
           }
           log(`${source.key} data fetched from source`)
