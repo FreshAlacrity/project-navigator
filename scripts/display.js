@@ -1,9 +1,13 @@
 function newSearch(terms = '') {
   //log(`Searching...${terms}`)
-  document.title = terms + ' | Project Navigator'
+  if (!terms) {
+    document.title = 'FreshAlacrity | Project Navigator'
+  } else {
+    document.title = terms + ' | Project Navigator'
+  }
   // #later detect project IDs + sub in project titles
   //document.getElementById('page-title').innerText = `: ${terms}`
-  updateProjectList(terms) // #todo get data
+  updateProjectList(getSource(), terms) // #todo get data
 }
 
 function newUrl(paramsObj = {}) {
@@ -96,7 +100,7 @@ function prettyLink(entry, key, parent) {
 
 function emptyProject() {
   let blankProject = {}
-  stored._projects_list_headers.forEach(h => {
+  globalStorage._projects_list_headers.forEach(h => {
     blankProject[h] = '+'
   })
   // #todo fix links showing up oddly
@@ -104,7 +108,7 @@ function emptyProject() {
   return blankProject
 }
 
-function updateProjectList(searchTerms = '') {
+function updateProjectList(source, searchTerms = '') {
   function makeProjectEntry(a, open = false) {
     //let entry = document.createElement('li')
     let entry = document.createElement('details')
@@ -149,7 +153,7 @@ function updateProjectList(searchTerms = '') {
   let projectList = document.createElement('main')
   projectList.setAttribute('id', 'project-list-container')
 
-  let projectsArr = search(stored, searchTerms)._showing
+  let projectsArr = search(source, searchTerms).showing
   let open = (projectsArr.length < 3) // #later tweak this to take project entry length into account
   projectsArr.forEach(a => {
     projectList.appendChild(makeProjectEntry(a, open))
@@ -176,9 +180,9 @@ function addNew(input) {
   projectObj['Project ID'] = makeId()
   
   // add the new entry to the right places
-  stored._projects_list.push(projectObj)
-  stored._projects_by_ID[projectObj['Project ID']] = projectObj
-  stored._IDs_by_title[input] = projectObj['Project ID']
+  globalStorage[globalStorage._current_type]._list.push(projectObj)
+  globalStorage[globalStorage._current_type]._by_ID[projectObj['Project ID']] = projectObj
+  globalStorage[globalStorage._current_type]._by_title[input] = projectObj['Project ID']
   
   // #todo save to the sheet
 
@@ -186,7 +190,7 @@ function addNew(input) {
   newSearch(projectObj['Project ID'])
 }
 
-function display(data) {
+function display(source) {
   function makeSearchElement() {
     // see https://stackoverflow.com/questions/4509761/whats-the-best-semantic-way-to-wrap-a-search-area/4509828
     /*
@@ -281,8 +285,6 @@ function display(data) {
   }
 
   //let divider = ' · '
-
-  stored = data // supports current project update function
 
   let page = document.createElement('div')
   page.setAttribute('id', 'page')

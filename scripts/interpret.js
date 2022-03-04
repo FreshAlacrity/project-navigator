@@ -9,23 +9,22 @@ function checkSpreadsheetImport (data) {
   }
 }
 
-function getSheetData(sheetData, key) {
-  let newObj = {}
-  let arr = []
-  let headers = sheetData[0]
-  sheetData = sheetData.slice(2) // to remove the header and the row of analytics
-  sheetData.forEach(row => {
-    let name = row[0]
-    let newObj = {}
-    newObj = {}
-    headers.forEach((header, index) => {
+function getSheetData(sheetData) {
+  let data = { 
+    headers: sheetData[0],
+    list: [] 
+  }
+
+  // slice to remove the header and the row of analytics
+  sheetData.slice(2).forEach(row => {
+    // #later can I do this with map()?
+    let rowObj = {}
+    data.headers.forEach((header, index) => {
       if (header !== '' && row[index] !== '') {
-        newObj[header] = row[index]
+        rowObj[header] = row[index]
       }
     })
-    arr.push(newObj)
+    data.list.push(rowObj)
   })
-  newObj[key + '_headers'] = headers
-  newObj[key] = arr
-  return newObj
+  return data
 }

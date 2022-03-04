@@ -79,13 +79,15 @@ function excludeRetired(e) {
   }
 }
 
-function merge(allData) {
-  allData._projects_list.forEach(checkEntry)
-  allData._projects_list = allData._projects_list.filter(excludeRetired)
-  allData._projects_list = allData._projects_list.map(assignKeywords)
-  // #todo sort _projects_list by '_Test' (and then calculate that here next)
-  allData._projects_by_ID = byKey(allData._projects_list, 'Project ID')
-  allData._IDs_by_title = makeTitleDict(allData._projects_by_ID)
+function merge(source) {
+  source.data.list.forEach(checkEntry)
+  source.data.list = source.data.list.filter(excludeRetired)
+  source.data.list = source.data.list.map(assignKeywords)
+  source.data.by_ID = byKey(source.data.list, source.id)
+  source.data.by_title = makeTitleDict(source.data.by_ID)
+
+  // to save changes to sheet:
   //update(entryObj = { 'Project ID': '443BF665', 'Project Title': 'Test Project' })
-  return allData
+  
+  return source
 }

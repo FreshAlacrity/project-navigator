@@ -1,66 +1,45 @@
-
-// localForage automatically does JSON.parse() and JSON.stringify() when getting/setting values
-async function gatherData(fresh = false) {
-  const gitHubURL = 'https://github.com/FreshAlacrity/project-navigator/main/'
-  const sheetsURL = 'https://script.google.com/macros/s/AKfycbwKryEU-Vhr-1m18QsRSc6CMjiNRcSbSCgNO5hOalOC6vtwtyLVme_kPvqZV_2FMmGc/exec'
-
-  // get url parameters
-  let dataObj = {}
-  let params = new URLSearchParams(window.location.search)
-  let dataSources = [
-    {
-      key: '_projects_list',
-      // 'fetch' param supports fetching data from different/test sheets
-      loc: (params.get('fetch') ?? 'projects'), 
-      url: sheetsURL,
-      parse: getSheetData,
-      always_fetch: false
-    }
-  ]
-  
-  // check what keys localForage has saved (later maybe avoid if fresh is set?)
-  let localTest = await localforage.keys().then(keys => {
-    if (params.get('reload')) {
-      log(`Loading fresh data, clearing local keys: ${keys.join(", ")}`)
-      keys.forEach(a => { localforage.removeItem(a) })
-      return {}
-    } else {
-      return Object.fromEntries(keys.map(key => [key, true]))
-    }
+async function store(source) {
+  // localForage automatically does JSON.parse() and JSON.stringify() when getting/setting values
+  localforage.setItem(source.key, source.data).then(data => {
+    log(`stored ${source.key}`)//${JSON.stringify(data)} to `)
   }).catch(log)
+  return source
+}
 
-  function stored(key) { 
-    return localTest.hasOwnProperty(key) 
-  }
-  
-  function store(key, obj) { 
-    localforage.setItem(key, obj).catch(log) 
-  }
+async function load(source) {
+  return fetch(source.url, { credentials: "omit" })
+    .then((response) => response.json())
+    .then((data) => {
+      if (source.type === 'Google Sheets') {
+        source.data = getSheetData(data)
+      }
+      log(`${source.key} loaded from source`)
+      return source
+    }).catch(log)
+}
 
-  function load(source) {
-    if (!fresh && !source.always_fetch && stored(source.key)) {
+async function getlocal(source) {
+  return localforage.getItem(source.key).then(data => {
+    log(`${source.key} fetched from local storage`)
+    source.data = data
+    return source
+  }).catch(log)
+}
 
-      return localforage.getItem(source.key).then(data => {
-        log(`${source.key} data loaded from local storage`)
-        return data
-      }).catch(log)
-
-    } else {
-
-      return fetch(source.url + '?loc=' + source.loc, { credentials: "omit" })
-        .then((response) => response.json())
-        .then((data) => {
-          if (typeof source.parse === 'function') {
-            data = source.parse(data, source.key)
-          }
-          log(`${source.key} data fetched from source`)
-          store(source.key, data)
-          return data
-        }).catch(log)
-
+localforage.keys().then(keys => {
+  for (const [type, source] of Object.entries(globalStorage._data_sources)) {
+    log(`comparing ${source.key} and ${keys}`)
+    if (keys.includes(source.key)) {
+      // fetch it from local storage
+      getlocal(source).then(merge).then(display)
+    }
+    if (!keys.includes(source.key) || source.always_fetch || globalStorage._force_reload) {
+      // load in from external source
+      load(source).then(store).then(merge).then(display)
     }
   }
-
-  let tests = await Promise.all(dataSources.map(load))
-  return merge(Object.assign(dataObj, ...tests))
-}
+  // #later confirm when all loading data is loaded in the log and change cursor to normal
+  //let tests = await Promise.all(dataSources.map(load))
+  //return merge(Object.assign(dataObj, ...tests))
+  //testSearch()
+})

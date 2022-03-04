@@ -8,7 +8,7 @@ function testSearch() {
   let stop = false
   testCases.forEach(t => {
     if (!stop) {
-      let result = evaluatePossibleMatches(stored, t)
+      let result = evaluatePossibleMatches(globalStorage, t)
       if (Object.keys(result).length === 0) {
         log('No matches found for ' + t)
         stop = true
@@ -29,10 +29,10 @@ function testSearch() {
 }
 
 // find fit values for each entry in the list
-function evaluatePossibleMatches(projectsObj, searchTerms) {
+function evaluatePossibleMatches(source, searchTerms) {
   let searchResults = {}
-  let idsDict = projectsObj._projects_by_ID
-  let titlesDict = projectsObj._IDs_by_title
+  let idsDict = source.data.by_ID
+  let titlesDict = source.data.by_title
 
   // Search for and remove any Project IDs
   let words = searchTerms.split(' ')
@@ -79,19 +79,19 @@ function evaluatePossibleMatches(projectsObj, searchTerms) {
   return searchResults
 }
 
-function search(projectsObj, searchTerms = '') {
-  searchResults = evaluatePossibleMatches(projectsObj, searchTerms)
+function search(source, searchTerms = '') {
+  searchResults = evaluatePossibleMatches(source, searchTerms)
 
   if (Object.keys(searchResults).length === 0) {
     // #later fix issue with old search result match #s being shown
     // there's no search results, so just return all projects
-    projectsObj._showing = projectsObj._projects_list
+    source.showing = source.data.list
     
-    projectsObj._showing.sort((a, b) => {
+    source.showing.sort((a, b) => {
       return a._Test - b._Test
     })
   } else {
-    projectsObj._showing = projectsObj._projects_list.filter(entry => {
+    source.showing = source.data.list.filter(entry => {
       // display how well the project matched the search for debug:
       entry.Match = (searchResults[entry['Project ID']] * 100)
       if (searchResults[entry['Project ID']] > 0) {
@@ -101,9 +101,9 @@ function search(projectsObj, searchTerms = '') {
       }
     })
     
-    projectsObj._showing.sort((a, b) => {
+    source.showing.sort((a, b) => {
       return b.Match - a.Match
     })
   }
-  return projectsObj
+  return source
 }
