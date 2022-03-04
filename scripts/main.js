@@ -4,6 +4,6 @@ var stored = { test: false }
 gatherData().then(data => {
   display(data)
   // debug
-  testSearch()
+  //testSearch()
 }) // #todo simplify
 

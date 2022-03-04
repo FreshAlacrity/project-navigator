@@ -72,15 +72,11 @@ function checkEntry(e) {
 
 function excludeRetired(e) {
   if (e.Stage === 'Retired') { 
-    log(`excluding retired project: ${e['Project Title']}`)
+    //log(`excluding retired project: ${e['Project Title']}`)
     return false 
   } else { 
     return true 
   }
-}
-
-function makePropertyList() {
-
 }
 
 function merge(allData) {

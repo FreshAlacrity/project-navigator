@@ -5,15 +5,30 @@ function testSearch() {
   }
   let testCases = exampleNames()
   let startTime = performance.now()
+  let stop = false
   testCases.forEach(t => {
-    //log(t)
-    //evaluatePossibleMatches(stored, t)
+    if (!stop) {
+      let result = evaluatePossibleMatches(stored, t)
+      if (Object.keys(result).length === 0) {
+        log('No matches found for ' + t)
+        stop = true
+      } else if (Object.keys(result).length !== 1) {
+        log(t + ' ' + JSON.stringify(result))
+        stop = true
+        /*
+        for (const [key, value] of Object.entries(result)) {
+          // list names and aliases + match value?
+          // for now just show the first search results
+        }
+        */
+      }
+    }
   })
   let endTime = performance.now()
   log(`search test took ${Math.floor(endTime - startTime)} milliseconds`)
 }
 
-
+// find fit values for each entry in the list
 function evaluatePossibleMatches(projectsObj, searchTerms) {
   let searchResults = {}
   let idsDict = projectsObj._projects_by_ID
@@ -35,6 +50,7 @@ function evaluatePossibleMatches(projectsObj, searchTerms) {
       searchResults[titlesDict[p.trim().toLowerCase()]] = 1
       searchTerms = searchTerms.replace(p, '')
     }
+    // compare levenshtein distance here?
   })
   
   searchTerms = searchTerms.trim()
@@ -49,39 +65,45 @@ function evaluatePossibleMatches(projectsObj, searchTerms) {
         let tWords = t.split(' ')
         tWords.forEach(tW => {
           if (tW.length > 2 && searchTerms.toLowerCase().includes(tW)) {
-            log(`'${searchTerms.toLowerCase()}' includes '${tW}'`)
-            searchResults[titlesDict[t]] = tW.length/Math.max(searchTerms.length, t.length)
+            searchResults[titlesDict[t]] = searchResults[titlesDict[t]] ?? 0
+            searchResults[titlesDict[t]] += tW.length/Math.max(searchTerms.length, t.length)
           } else if (tW.slice(0, searchTerms.length) === searchTerms.toLowerCase()){
-            searchResults[titlesDict[t]] = searchTerms.length/t.length
-          } else {
-            // compare levenshtein distance?
+            searchResults[titlesDict[t]] = searchResults[titlesDict[t]] ?? 0
+            searchResults[titlesDict[t]] += searchTerms.length/t.length
           }
         })
       }
     })
   }
+
   return searchResults
 }
 
 function search(projectsObj, searchTerms = '') {
-  
   searchResults = evaluatePossibleMatches(projectsObj, searchTerms)
 
   if (Object.keys(searchResults).length === 0) {
     // #later fix issue with old search result match #s being shown
     // there's no search results, so just return all projects
     projectsObj._showing = projectsObj._projects_list
+    
+    projectsObj._showing.sort((a, b) => {
+      return a._Test - b._Test
+    })
   } else {
     projectsObj._showing = projectsObj._projects_list.filter(entry => {
       // display how well the project matched the search for debug:
-      entry.Match = (searchResults[entry['Project ID']] * 100) + '%'
+      entry.Match = (searchResults[entry['Project ID']] * 100)
       if (searchResults[entry['Project ID']] > 0) {
         return true
       } else {
         return false
       }
     })
-    // #later sort list by search match %
+    
+    projectsObj._showing.sort((a, b) => {
+      return b.Match - a.Match
+    })
   }
   return projectsObj
 }
