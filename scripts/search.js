@@ -48,7 +48,7 @@ function evaluatePossibleMatches(projectsObj, searchTerms) {
       } else {
         let tWords = t.split(' ')
         tWords.forEach(tW => {
-          if (searchTerms.toLowerCase().includes(tW)) {
+          if (tW.length > 2 && searchTerms.toLowerCase().includes(tW)) {
             log(`'${searchTerms.toLowerCase()}' includes '${tW}'`)
             searchResults[titlesDict[t]] = tW.length/Math.max(searchTerms.length, t.length)
           } else if (tW.slice(0, searchTerms.length) === searchTerms.toLowerCase()){
