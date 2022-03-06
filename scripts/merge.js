@@ -1,16 +1,16 @@
-function update(entryObj) {
+function update(source, entryObj) {
   if (entryObj) {
     // #later better validation here
-    fetch(sheetsURL, {
+    fetch(source.url, {
       credentials:'omit', 
       method:"POST", 
       body:JSON.stringify(entryObj),
       headers: { 'Content-Type': 'application/json' },
       mode:"no-cors"
       })
-    .then(response => log(`Updated project ID ${entryObj['Project ID']} with response: '${JSON.stringify(response)}'`));
+    .then(response => log(`Updated project ID ${entryObj['Project ID']} with response: '${JSON.stringify(response)}'`))
   } else {
-    log(`Can't update a project without a project entry object!`)
+    throw `Can't update a project without a project entry object!`
   }
 }
 
@@ -79,15 +79,36 @@ function excludeRetired(e) {
   }
 }
 
+function getRelations(source) {
+  // #todo:
+  // add all children to a Children property on the parent
+  // add all siblings to a _Siblings property
+  // remove See Also links to parents and children &
+  // make a note of See Also links that are also siblings (this might actually be useful information to keep if a parent has many children, but it also might help to re-arrange those under a sub-parent or promote one of them to parent of the others)
+  // if a project links to another project but that one doesn't link back, alert about it for now to see if we want to automatically add link-backs
+  return source
+}
+
+function linkByKeywords(source) {
+  // #todo:
+  // check if the project is already a parent, child, see also, or sibling first
+  // any project that contains another project's title, alias, or ID in properties contained in the source.keyword_sources array, including from urls:
+  // add support for formatting like+this or like_this or like-this etc. (might need to reign that in or add a keyword-exclude list to keep it from being too greedy)
+  // for now just log potential keyword links
+  return source
+}
+
 function merge(source) {
   source.data.list.forEach(checkEntry)
   source.data.list = source.data.list.filter(excludeRetired)
   source.data.list = source.data.list.map(assignKeywords)
   source.data.by_ID = byKey(source.data.list, source.id)
   source.data.by_title = makeTitleDict(source.data.by_ID)
+  source = getRelations(source)
+  source = linkByKeywords(source)
 
-  // to save changes to sheet:
-  //update(entryObj = { 'Project ID': '443BF665', 'Project Title': 'Test Project' })
+  // to save changes back to sheet: check for changes to sheet header properties, then:
+  //update(source, entryObj = { 'Project ID': '443BF665', '_Note': '123' })
   
   return source
 }

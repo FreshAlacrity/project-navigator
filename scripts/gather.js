@@ -31,7 +31,7 @@ localforage.keys().then(keys => {
   for (const [type, source] of Object.entries(globalStorage._data_sources)) {    
     if (keys.includes(source.key)) {
       // fetch it from local storage
-      getlocal(source).then(merge).then(display)
+      getlocal(source).then(display)
     }
     if (!keys.includes(source.key) || source.always_fetch || globalStorage._force_reload) {
       // load in from external source

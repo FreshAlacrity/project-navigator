@@ -15,8 +15,9 @@ globalStorage._data_sources[globalStorage._current_type] = {
     type: 'Google Sheets',
     name: 'Project Title',
     id: 'Project ID',
+    about_id: '2FFFFAB9',
     alias_list: ['Aliases'],
-    order_by: '_Test',
+    order_by: '_Sort',
     image_url_stem: '/images/', // for fields that end in .png .jpg etc, pre-pend this for <img> elements
     keyword_list: 'See Also', // where assigned keyword project IDs will be stored #todo
     allowed_keywords: ['Project Title', 'Aliases', 'Project ID'],
@@ -37,6 +38,7 @@ globalStorage._data_sources[globalStorage._current_type] = {
     always_fetch: false,
     data: {}
   }
+// #later add entries for Shoutouts, Wandering Library and Glossary
 
 function getSource() {
   return globalStorage._data_sources[globalStorage._current_type]

@@ -1,13 +1,22 @@
+function idToTitle(source, string) {
+  // #todo account for merged IDs as well
+  for (const [id, entry] of Object.entries(source.data.by_ID)) {
+    string = string.replaceAll(id, entry[source.name])
+  }
+  return string
+}
+
 function newSearch(terms = '') {
+  let source = getSource()
   //log(`Searching...${terms}`)
   if (!terms) {
     document.title = 'FreshAlacrity | Project Navigator'
   } else {
-    document.title = terms + ' | Project Navigator'
+    document.title = idToTitle(source, terms) + ' | Project Navigator'
   }
   // #later detect project IDs + sub in project titles
   //document.getElementById('page-title').innerText = `: ${terms}`
-  updateProjectList(getSource(), terms) // #todo get data
+  updateProjectList(source, terms) // #todo get data
 }
 
 function newUrl(paramsObj = {}) {
@@ -30,7 +39,7 @@ function updateUrl(paramsObj = {}) {
 
 function getLinkTitle(link) {
   let aliases = {
-    'github.com':'GitHub Source',
+    'github.com':'GitHub',
     'script.google.com':'Google Apps Script',
     'codepen.io':'CodePen',
     'drive.google.com': 'Google Drive',
@@ -60,44 +69,6 @@ function makeDetail() {
   return document.createElement('li')
 }
 
-function prettyDate(entry, key, parent) {
-  let detail = makeDetail()
-  detail.innerHTML = key + ': '
-  let date = document.createElement('time')
-  let dayOf = entry[key].split('T')[0]
-  date.innerHTML = dayOf
-  detail.appendChild(date)
-  parent.appendChild(detail)
-  return 1
-}
-
-function span(entry, key, parent) {
-  let detail = makeDetail()
-  detail.innerHTML = key + ': '
-  let span = document.createElement('span')
-  span.innerHTML = entry[key]
-  detail.appendChild(span)
-  parent.appendChild(detail)
-  return 1
-}
-
-function prettyLink(entry, key, parent) {
-  let links = entry[key].split(', ')
-  links.forEach(c => {
-    let detail = makeDetail()
-    let link = document.createElement('a')
-    link.setAttribute('href', c)
-    if (key === '_Other') {
-      link.innerHTML = getLinkTitle(link)
-    } else {
-      link.innerHTML = key
-    }
-    detail.appendChild(link)
-    parent.appendChild(detail)
-  })
-  return links.length
-}
-
 function emptyProject() {
   let blankProject = {}
   globalStorage._projects_list_headers.forEach(h => {
@@ -108,13 +79,12 @@ function emptyProject() {
   return blankProject
 }
 
-function makeProjectEntry(a, open = false) {
+function makeProjectEntry(a, open = false, source) {
   //let entry = document.createElement('li')
   let entry = document.createElement('details')
 
-  if (open) {
-    entry.setAttribute('open', 'true') // can't be removed by setting false
-  }
+  // note - this can't be removed by setting open to false:
+  if (open) { entry.setAttribute('open', 'true') }
 
   let title = document.createElement('summary')
   title.setAttribute('class', 'project-title')
@@ -123,25 +93,57 @@ function makeProjectEntry(a, open = false) {
 
   let details = document.createElement('ul')
 
-  // #next add images
-  // #todo detect these automatically
-  let printSettings = {
-    'Last Shipped': prettyDate,
-    'Last Updated': prettyDate,
-    'Brief': prettyLink,
-    '_Other': prettyLink,
-    'Inspiration': prettyLink,
-    'Learn More': prettyLink,
-    'Mockup': prettyLink,
-    'Live': prettyLink
+  // #todo add support for images (.png .jpg .jpeg)
+  // #todo add date formatting with Luxon (and format string to source.date_format)
+
+  function span(entry, key, parent) {
+    let detail = makeDetail()
+    detail.innerHTML = key + ': '
+    let span = document.createElement('span')
+    span.innerHTML = idToTitle(source, entry[key])
+    detail.appendChild(span)
+    parent.appendChild(detail)
+    return 1
   }
-  Object.keys(a).forEach(b => {
-    if (a[b] && b.charAt(0) !== '_' || printSettings.hasOwnProperty(b)){
-      let printFunction = printSettings[b] ?? span
-      printFunction(a, b, details)
+
+  function val(entry, key, parent) {
+    let detail = makeDetail()
+    detail.innerHTML = key + ': '
+    let span = document.createElement('span')
+    span.innerHTML = entry[key]
+    detail.appendChild(span)
+    parent.appendChild(detail)
+    return 1
+  }
+
+  function prettyLink(entry, key, parent) {
+    let links = entry[key].split(', ')
+    links.forEach(c => {
+      let detail = makeDetail()
+      let link = document.createElement('a')
+      link.setAttribute('href', c)
+      if (key === '_Other') {
+        link.innerHTML = getLinkTitle(link)
+      } else {
+        link.innerHTML = key
+      }
+      detail.appendChild(link)
+      parent.appendChild(detail)
+    })
+    return links.length
+  }
+
+  Object.keys(a).forEach(property => {
+    let printFunction = span
+    if (typeof a[property] === 'string') {
+      if (a[property].slice(0, 4) === 'http') {
+        printFunction = prettyLink
+      }
     } else {
+      printFunction = val
       // #later allow adding + editing project information
     }
+    printFunction(a, property, details)
   })
 
   entry.appendChild(details)
@@ -159,7 +161,7 @@ function updateProjectList(source, searchTerms = '') {
   let projectsArr = search(source, searchTerms).showing
   let open = (projectsArr.length < 3) // #later tweak this to take project entry length into account
   projectsArr.forEach(a => {
-    projectList.appendChild(makeProjectEntry(a, open))
+    projectList.appendChild(makeProjectEntry(a, open, source))
   })
   // #todo make this conditional on edit mode:
   //projectList.appendChild(makeProjectEntry(emptyProject(), false))
@@ -302,7 +304,8 @@ function display(source) {
   // #later make it so these don't reload the page?
   let homeLink = document.createElement('a')
   // link to home project ('About Me')
-  homeLink.setAttribute('href', newUrl({ s: '2FFFFAB9' }))
+  homeLink.setAttribute('id', 'now-showing')
+  homeLink.setAttribute('href', newUrl({ s: source.about_id }))
   homeLink.innerText = 'FreshAlacrity'
   title.appendChild(homeLink)
 
