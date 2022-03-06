@@ -83,17 +83,16 @@ function search(source, searchTerms = '') {
   searchResults = evaluatePossibleMatches(source, searchTerms)
 
   if (Object.keys(searchResults).length === 0) {
-    // #later fix issue with old search result match #s being shown
     // there's no search results, so just return all projects
     source.showing = source.data.list
-    
+    source.data.list.forEach(entry => { delete entry.Match })
     source.showing.sort((a, b) => {
       return a[source.order_by] - b[source.order_by] // #test
     })
   } else {
     source.showing = source.data.list.filter(entry => {
       // display how well the project matched the search for debug:
-      entry.Match = (searchResults[entry[source.id]] * 100)
+      entry.Match = (searchResults[entry[source.id]])
       if (searchResults[entry[source.id]] > 0) {
         return true
       } else {

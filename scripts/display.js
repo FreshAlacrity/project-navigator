@@ -93,24 +93,61 @@ function makeProjectEntry(a, open = false, source) {
 
   let details = document.createElement('ul')
 
+  // #next start set up to adding + editing project information
+  // #todo put all links on one line
   // #todo add support for images (.png .jpg .jpeg)
   // #todo add date formatting with Luxon (and format string to source.date_format)
+  // #later detect data format in merge step and add a key to which properties should be displayed in different ways to the source object; include datalist types for limited options
+  /* via https://stackoverflow.com/a/31016229/2735578
+    <label>Choose a browser from this list:
+    <input list="browsers" name="myBrowser" /></label>
+    <datalist id="browsers">
+      <option value="Chrome">
+      <option value="Firefox">
+      <option value="Internet Explorer">
+      <option value="Opera">
+      <option value="Safari">
+      <option value="Microsoft Edge">
+    </datalist>
+  // #later add support for adding project IDs to a list of IDs by searching name + alias from input until only one project matches input
+  */
 
   function span(entry, key, parent) {
     let detail = makeDetail()
     detail.innerHTML = key + ': '
     let span = document.createElement('span')
-    span.innerHTML = idToTitle(source, entry[key])
+    if (key != source.id) {
+      span.innerHTML = idToTitle(source, entry[key])
+    } else {
+      // #later change this to say 'Permalink' and offer permalink to project:
+      span.innerHTML = entry[key] 
+    }
     detail.appendChild(span)
     parent.appendChild(detail)
     return 1
   }
 
   function val(entry, key, parent) {
+    let fill = '☆✭★'
     let detail = makeDetail()
     detail.innerHTML = key + ': '
     let span = document.createElement('span')
-    span.innerHTML = entry[key]
+    let n = entry[key]
+    if (n === Math.floor(n)) {
+      if (n <= 10) {
+        span.innerHTML = '★'.repeat(Math.floor(Math.abs(n/2))) + '☆'.repeat(5 - Math.floor(Math.abs(n/2)))
+      } else {
+        span.innerHTML = n
+      }
+    } else if (typeof n === 'number') {
+      span.innerHTML = Math.floor(n * 100) + '%'
+    } else if (n === true) {
+      span.innerHTML = '<input type="checkbox" checked>'
+    } else if (n === false) {
+      span.innerHTML = '<input type="checkbox">'
+    } else {  
+      span.innerHTML = n
+    }
     detail.appendChild(span)
     parent.appendChild(detail)
     return 1
@@ -141,7 +178,6 @@ function makeProjectEntry(a, open = false, source) {
       }
     } else {
       printFunction = val
-      // #later allow adding + editing project information
     }
     printFunction(a, property, details)
   })

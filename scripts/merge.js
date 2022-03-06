@@ -86,6 +86,7 @@ function getRelations(source) {
   // remove See Also links to parents and children &
   // make a note of See Also links that are also siblings (this might actually be useful information to keep if a parent has many children, but it also might help to re-arrange those under a sub-parent or promote one of them to parent of the others)
   // if a project links to another project but that one doesn't link back, alert about it for now to see if we want to automatically add link-backs
+  // prune references to projects that don't exist in this dataset
   return source
 }
 
@@ -98,6 +99,13 @@ function linkByKeywords(source) {
   return source
 }
 
+function addSortValues(source) {
+  // #todo check if it's a project type list
+  // alter source.order_by
+  // #next get equation + notes from spreadsheet
+  return source
+}
+
 function merge(source) {
   source.data.list.forEach(checkEntry)
   source.data.list = source.data.list.filter(excludeRetired)
@@ -106,7 +114,7 @@ function merge(source) {
   source.data.by_title = makeTitleDict(source.data.by_ID)
   source = getRelations(source)
   source = linkByKeywords(source)
-
+  source = addSortValues(source)
   // to save changes back to sheet: check for changes to sheet header properties, then:
   //update(source, entryObj = { 'Project ID': '443BF665', '_Note': '123' })
   
