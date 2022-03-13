@@ -134,7 +134,7 @@ function makeProjectEntry(a, open = false, source) {
     let span = document.createElement('span')
     let n = entry[key]
     if (n === Math.floor(n)) {
-      if (n <= 10) {
+      if (n >= 0 && n <= 10) {
         span.innerHTML = '★'.repeat(Math.floor(Math.abs(n/2))) + '☆'.repeat(5 - Math.floor(Math.abs(n/2)))
       } else {
         span.innerHTML = n
