@@ -184,3 +184,4 @@ Previous versions have been developed on CodePen; the current version is live on
   - [Carrd](https://carrd.co/)
   - [Lope - App on Google Play](https://play.google.com/store/apps/details?id=com.twoorgu.lope)
   - [Toggl Time Tracker](https://toggl.com/)
+  - [Google Snippets](http://blog.idonethis.com/google-snippets-internal-tool/)
